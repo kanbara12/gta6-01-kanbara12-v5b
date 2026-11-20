@@ -36,11 +36,11 @@ export function createCharacters(scene, state) {
   // the old small dark block was unreadable at 1280x720 and vanished
   // behind the body from the shot angle.
   const p = makeFigure(0x2a2a33, 0xf5d8b0, 0xc81e2a);
-  const gun = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.24, 0.85), new THREE.MeshPhongMaterial({ color: 0xd8d8e0, shininess: 180, specular: 0xffffff }));
+  const gun = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.30, 1.0), new THREE.MeshPhongMaterial({ color: 0xd8d8e0, shininess: 180, specular: 0xffffff }));
   gun.position.set(0.48, 1.18, 0.55);
   p.group.add(gun);
   const gunTip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, 0.18), new THREE.MeshPhongMaterial({ color: 0x888899, shininess: 160 }));
-  gunTip.position.set(0.48, 1.18, 0.98);
+  gunTip.position.set(0.48, 1.18, 1.08);
   p.group.add(gunTip);
   const gunSight = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.09, 0.05), new THREE.MeshBasicMaterial({ color: 0xffc040 }));
   gunSight.position.set(0.48, 1.33, 0.92);

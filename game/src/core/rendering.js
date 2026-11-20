@@ -35,8 +35,8 @@ export function createRendering(container) {
         vec3 col = mix(horizon, mid, smoothstep(0.0, 0.22, h));
         col = mix(col, zenith, smoothstep(0.18, 0.65, h));
         float sunAmt = max(dot(normalize(vDir), sunDir), 0.0);
-        col += vec3(1.0, 0.55, 0.2) * pow(sunAmt, 6.0) * 0.55;
-        col += vec3(1.0, 0.8, 0.45) * pow(sunAmt, 24.0) * 0.9;
+        col += vec3(1.0, 0.55, 0.2) * pow(sunAmt, 6.0) * 0.32;
+        col += vec3(1.0, 0.8, 0.45) * pow(sunAmt, 24.0) * 0.45;
         gl_FragColor = vec4(col, 1.0);
       }`,
   });
@@ -66,6 +66,16 @@ export function createRendering(container) {
   sunCore.position.copy(sunPos).add(sunDir.clone().multiplyScalar(-2));
   sunCore.lookAt(0, 0, 0);
   scene.add(sunCore);
+  // Orange rim ring behind the disc: a hard edge the eye can find even
+  // where the sky glow is brightest. Without it the disc dissolved into
+  // the sky shader's own sun halo.
+  const sunRim = new THREE.Mesh(
+    new THREE.RingGeometry(48, 60, 40),
+    new THREE.MeshBasicMaterial({ color: 0xff7a2a, fog: false, side: THREE.DoubleSide }),
+  );
+  sunRim.position.copy(sunPos).add(sunDir.clone().multiplyScalar(2));
+  sunRim.lookAt(0, 0, 0);
+  scene.add(sunRim);
 
   const glowCanvas = document.createElement('canvas');
   glowCanvas.width = glowCanvas.height = 256;
