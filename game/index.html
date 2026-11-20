@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUNCOAST: HEATLINE — an open-world crime game</title>
+<link rel="icon" href="favicon.ico">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #1a0e1e; }
+  body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #f5ead6; }
+  #game, #game canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud { position: absolute; inset: 0; pointer-events: none; z-index: 5; font-size: 14px; }
+  .card { background: rgba(12, 8, 18, 0.72); border: 1px solid rgba(255, 190, 90, 0.45); border-radius: 8px; padding: 8px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.45); }
+  #missionPanel { position: absolute; top: 14px; left: 14px; width: 330px; }
+  #missionPanel .job { color: #ffb347; font-weight: 800; font-size: 17px; letter-spacing: 0.4px; }
+  #missionPanel .obj { color: #f5ead6; font-size: 13.5px; margin-top: 3px; line-height: 1.3; }
+  #missionPanel .next { color: #b9a8c9; font-size: 12.5px; margin-top: 3px; }
+  #missionPanel .timer { color: #8fd6ff; font-size: 13px; margin-top: 4px; font-weight: 700; }
+  #missionPanel .marker { color: #ffd76a; font-size: 12.5px; margin-top: 2px; }
+  #moneyPanel { position: absolute; top: 14px; right: 14px; width: 250px; text-align: right; }
+  #moneyPanel .cash { color: #7dff9a; font-weight: 800; font-size: 24px; }
+  #moneyPanel .line { color: #e8ddc8; font-size: 13px; margin-top: 2px; }
+  #moneyPanel .stars { color: #ffd700; font-size: 17px; letter-spacing: 2px; margin-top: 2px; }
+  #moneyPanel .stars .off { color: rgba(255,255,255,0.28); }
+  #repBarWrap { height: 6px; background: rgba(255,255,255,0.18); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+  #repBar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffb347, #ff5e7a); }
+  #policePanel { position: absolute; top: 148px; right: 14px; width: 250px; }
+  #policePanel .head { color: #ff8a7a; font-weight: 800; font-size: 12.5px; letter-spacing: 1px; margin-bottom: 5px; }
+  #policePanel .row { display: flex; justify-content: space-between; font-size: 13px; padding: 2px 0; color: #f5ead6; }
+  #policePanel .row .st { color: #ffb347; font-weight: 700; }
+  #radioPanel { position: absolute; left: 14px; bottom: 14px; width: 330px; }
+  #radioPanel .station { color: #8fd6ff; font-weight: 700; font-size: 13.5px; }
+  #radioPanel .weapons { display: flex; gap: 6px; margin-top: 6px; }
+  #radioPanel .wslot { flex: 1; text-align: center; font-size: 11.5px; padding: 4px 2px; border: 1px solid rgba(255,255,255,0.25); border-radius: 5px; color: #d8cdb8; background: rgba(255,255,255,0.05); }
+  #radioPanel .wslot.on { border-color: #ffb347; color: #ffb347; background: rgba(255,179,71,0.14); font-weight: 700; }
+  #radioPanel .abil { display: flex; gap: 7px; align-items: center; font-size: 12.5px; margin-top: 5px; color: #e8ddc8; }
+  #radioPanel .abil .port { width: 22px; height: 22px; border-radius: 50%; background: #7a4a8a; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12px; flex: none; }
+  #radioPanel .abil .key { color: #ffb347; font-weight: 800; }
+  #radioPanel .abil .st { margin-left: auto; color: #7dff9a; font-weight: 700; font-size: 11.5px; }
+  #speedo { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); text-align: center; width: 210px; }
+  #speedo .spd { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; }
+  #speedo .spd small { font-size: 13px; color: #d8cdb8; font-weight: 600; }
+  #speedo .bar { height: 5px; background: rgba(255,255,255,0.18); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+  #speedo .bar > div { height: 100%; }
+  #speedo .lbl { font-size: 11px; color: #d8cdb8; margin-top: 2px; display: flex; justify-content: space-between; }
+  #minimapWrap { position: absolute; right: 14px; bottom: 14px; width: 196px; text-align: center; }
+  #minimap { width: 180px; height: 180px; border-radius: 50%; border: 2px solid rgba(255,190,90,0.55); background: rgba(10, 8, 20, 0.78); }
+  #minimapWrap .dist { color: #ffd76a; font-size: 12.5px; font-weight: 700; margin-top: 3px; }
+  #minimapWrap .jobs { color: #e8ddc8; font-size: 12.5px; }
+  #dialogCard { position: absolute; left: 50%; bottom: 128px; transform: translateX(-50%); width: 520px; display: flex; gap: 10px; align-items: flex-start; }
+  #dialogCard .port { width: 44px; height: 44px; border-radius: 50%; background: #7a4a8a; color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; flex: none; border: 2px solid rgba(255,255,255,0.5); }
+  #dialogCard .who { color: #ffb347; font-weight: 800; font-size: 13.5px; }
+  #dialogCard .txt { color: #f5ead6; font-size: 13.5px; line-height: 1.35; margin-top: 2px; }
+  #popups { position: absolute; left: 50%; top: 42%; transform: translateX(-50%); text-align: center; }
+  #popups .pop { color: #7dff9a; font-weight: 800; font-size: 22px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); margin-top: 4px; }
+  #crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 22px; font-weight: 800; text-shadow: 0 0 4px #000; display: none; }
+  #toast { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); background: rgba(12,8,18,0.85); border: 1px solid #ffb347; color: #ffd76a; font-weight: 700; font-size: 15px; padding: 8px 18px; border-radius: 8px; display: none; }
+  #startCard, #pauseMenu, #endCard { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: auto; background: rgba(8, 4, 14, 0.55); z-index: 10; }
+  .panelBig { width: 560px; background: rgba(14, 9, 22, 0.92); border: 1px solid rgba(255,190,90,0.6); border-radius: 12px; padding: 26px 30px; text-align: center; }
+  .panelBig h1 { color: #ffb347; font-size: 34px; letter-spacing: 1px; }
+  .panelBig h2 { color: #ff5e7a; font-size: 15px; letter-spacing: 3px; margin-top: 2px; }
+  .panelBig p { color: #e8ddc8; font-size: 14px; line-height: 1.5; margin-top: 12px; }
+  .panelBig .keys { color: #8fd6ff; font-size: 13px; margin-top: 10px; line-height: 1.7; }
+  .panelBig button { pointer-events: auto; cursor: pointer; margin-top: 18px; background: #ff5e7a; color: #fff; border: none; border-radius: 8px; padding: 12px 30px; font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+  .panelBig button:hover { background: #ff7a90; }
+  .panelBig .stats { text-align: left; color: #e8ddc8; font-size: 14px; line-height: 1.9; margin-top: 12px; }
+  .panelBig .stats b { color: #ffd76a; }
+  #pauseMenu, #endCard { display: none; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+  <div id="missionPanel" class="card">
+    <div class="job" id="jobTitle">JOB 1/8 • A FAVOR IN THE HEAT</div>
+    <div class="obj" id="objective">Meet the fixer Rae at the glowing marker</div>
+    <div class="next" id="nextMission">NEXT: LOOSE CARGO</div>
+    <div class="timer" id="timer">0:00 / PAR 1:00</div>
+    <div class="marker" id="markerLine">MARKER 45 m</div>
+  </div>
+  <div id="moneyPanel" class="card">
+    <div class="cash" id="cash">$1,250</div>
+    <div class="line" id="hpLine">HP 100 &nbsp;•&nbsp; REP 0</div>
+    <div id="repBarWrap"><div id="repBar"></div></div>
+    <div class="stars" id="stars"></div>
+    <div class="line" id="policeLine">POLICE: CLEAR</div>
+  </div>
+  <div id="policePanel" class="card hidden">
+    <div class="head">POLICE RESPONSE</div>
+    <div id="policeRows"></div>
+  </div>
+  <div id="radioPanel" class="card">
+    <div class="station" id="station">SHORELINE 96.7 • Sunset Run</div>
+    <div class="weapons" id="weapons"></div>
+    <div id="abilities"></div>
+  </div>
+  <div id="speedo" class="card">
+    <div class="spd"><span id="speed">0</span> <small>KM/H</small></div>
+    <div class="bar"><div id="fuelBar" style="width:100%;background:#7dff9a"></div></div>
+    <div class="bar"><div id="condBar" style="width:100%;background:#ffb347"></div></div>
+    <div class="lbl"><span id="fuelLbl">FUEL 100%</span><span id="condLbl">HEATLINE GT — COND 100%</span></div>
+  </div>
+  <div id="minimapWrap">
+    <canvas id="minimap" width="180" height="180"></canvas>
+    <div class="dist" id="district">DOWNTOWN • Beachfront Rd</div>
+    <div class="jobs" id="jobsDone">0 JOBS DONE • GOLDEN</div>
+  </div>
+  <div id="dialogCard" class="card hidden">
+    <div class="port" id="dlgPort">R</div>
+    <div><div class="who" id="dlgWho">RAE — FIXER</div><div class="txt" id="dlgTxt"></div></div>
+  </div>
+  <div id="popups"></div>
+  <div id="crosshair">+</div>
+  <div id="toast"></div>
+</div>
+<div id="startCard">
+  <div class="panelBig">
+    <h1>SUNCOAST: HEATLINE</h1>
+    <h2>AN OPEN-WORLD CRIME GAME</h2>
+    <p>Suncoast is yours tonight. Eight jobs, one loop, $22,450 on the table. Steal the HEATLINE GT, run the fixer Rae's contracts, lose the heat, and bring it home to the lighthouse.</p>
+    <div class="keys">W A S D — drive / walk &nbsp;•&nbsp; E — enter / exit car &nbsp;•&nbsp; SPACE — brake &nbsp;•&nbsp; SHIFT — drift<br>1–4 — weapons &nbsp;•&nbsp; CLICK — fire (on foot) &nbsp;•&nbsp; Z / X / C — crew calls<br>R — radio &nbsp;•&nbsp; M — mute &nbsp;•&nbsp; H — hide HUD &nbsp;•&nbsp; P / ESC — pause</div>
+    <button id="btnStart">ENTER THE CITY</button>
+  </div>
+</div>
+<div id="pauseMenu">
+  <div class="panelBig">
+    <h1>PAUSED</h1>
+    <div class="stats" id="pauseStats"></div>
+    <button id="btnResume">RESUME</button>
+    <button id="btnSave" style="background:#3a6ea5">SAVE</button>
+    <button id="btnLoad" style="background:#3a6ea5">LOAD</button>
+  </div>
+</div>
+<div id="endCard">
+  <div class="panelBig">
+    <h1>STORY LOOP COMPLETE</h1>
+    <h2>$22,450 • REP 10 • 8 JOBS DONE</h2>
+    <p>The lighthouse light sweeps the north beach. Rae is already counting the cut. Same city, same heat — run it again, cleaner.</p>
+    <button id="btnAgain">RUN IT AGAIN</button>
+  </div>
+</div>
+<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js"}}</script>
+<script type="module" src="./src/core/main.js"></script>
+</body>
+</html>
