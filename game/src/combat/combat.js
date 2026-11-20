@@ -22,7 +22,7 @@ export function createCombat(scene, state, characters) {
   fctx.fillStyle = g;
   fctx.fillRect(0, 0, 64, 64);
   const flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(flashCanvas), transparent: true, depthWrite: false }));
-  flash.scale.set(0.9, 0.9, 1);
+  flash.scale.set(1.5, 1.5, 1);
   flash.visible = false;
   scene.add(flash);
   let flashTtl = 0;

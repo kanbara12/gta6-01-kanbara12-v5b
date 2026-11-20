@@ -154,7 +154,7 @@ function loop() {
   // close 3/4 chase camera; on foot follows just behind the player.
   // The title screen frames the hero car on the beach road.
   if (state.mode === 'shot' && state.shot === 'mission') {
-    missionCamera(camera, state);
+    missionCamera(camera, state, characters);
   } else if (state.mode === 'shot' && state.shot === 'end') {
     endCamera(camera, state);
   } else if (state.inCar || state.mode === 'title') {

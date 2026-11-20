@@ -94,17 +94,21 @@ export function createShots(state, dialog) {
         state.popups.push({ text: 'DRIFT x3 +$150', ttl: 999 });
         state.clockLabel = 'DUSK';
       } else if (name === 'mission') {
-        // On-foot yard sweep: player on the clear west apron of the lot,
-        // facing the three yard enemies, pistol out, muzzle flash on a
-        // slow rhythm (see combat). Sightline is clear of the containers.
+        // On-foot yard sweep, re-staged INSIDE the lot facing NORTH:
+        // the old staging put the player on the west fence line with
+        // the camera outside the fence, so fence rails crossed the
+        // frame and the gun (on the player's far side) was occluded.
+        // Now the camera sits inside the yard on the gun side, the
+        // fence is behind it, the NW sun is in the frame, and all
+        // three enemies stand clear of the containers.
         state.inCar = false;
         state.onFoot = true;
         state.cruise = false;
         state.carSpeed = 0;
         state.speedKmh = 0;
-        state.carPos.set(116, 0, 130);
-        state.playerPos.set(122, 0, 146);
-        state.playerHeading = Math.atan2(134 - 122, 147 - 146);
+        state.carPos.set(108, 0, 136);
+        state.playerPos.set(140, 0, 156);
+        state.playerHeading = Math.PI;
         characters.resetYard();
         state.targetsDown = 2;
         // Two enemies already bloodied by the sweep so far.
@@ -115,6 +119,8 @@ export function createShots(state, dialog) {
         state.clockLabel = 'GOLDEN';
       } else if (name === 'end') {
         // Loop complete at the lighthouse: player AND car in frame.
+        // Player stands on the ocean side of the car, clear of the
+        // palm lines, so no trunk hides either of them.
         state.inCar = false;
         state.onFoot = true;
         state.cruise = false;
@@ -122,7 +128,7 @@ export function createShots(state, dialog) {
         state.speedKmh = 0;
         state.carPos.set(-26, 0, -180);
         state.carHeading = Math.PI;
-        state.playerPos.set(-22.5, 0, -175);
+        state.playerPos.set(-29.5, 0, -176);
         state.playerHeading = Math.PI * 0.85;
         state.clockLabel = 'DUSK';
       }
@@ -132,21 +138,31 @@ export function createShots(state, dialog) {
   };
 }
 
-// Mission-shot camera: close over-the-shoulder from the player's right
-// side, so the pistol in the player's right hand and all three enemies
-// read in frame, with the yard's containers and fencing behind them.
-export function missionCamera(camera, state) {
+// Mission-shot camera: inside the yard, behind the player's gun side,
+// looking north at the three enemies. The player stands left of frame
+// with the pistol visible; the fence stays behind the camera.
+export function missionCamera(camera, state, characters) {
   const px = state.playerPos.x, pz = state.playerPos.z;
   const h = state.playerHeading;
   const fx = Math.sin(h), fz = Math.cos(h);
   const rx = fz, rz = -fx;
-  camera.position.set(px - fx * 4.5 + rx * 3.2, 3.0, pz - fz * 4.5 + rz * 3.2);
-  camera.lookAt(134, 1.0, 147);
+  camera.position.set(px - fx * 5.0 + rx * 3.5, 3.2, pz - fz * 5.0 + rz * 3.5);
+  let lx = px + fx * 8, lz = pz + fz * 8;
+  if (characters && characters.enemies && characters.enemies.length) {
+    let sx = 0, sz = 0;
+    for (const e of characters.enemies) { sx += e.mesh.position.x; sz += e.mesh.position.z; }
+    lx = sx / characters.enemies.length;
+    lz = sz / characters.enemies.length;
+  }
+  camera.lookAt(lx, 1.2, lz);
 }
 
-// End-scene camera: 3/4 view with player, car, lighthouse and ocean.
+// End-scene camera: HIGH three-quarter from behind the car, looking
+// north-west down the beach road. Shot from 9 m up, the palm trunks
+// are thin lines instead of a wall, the lighthouse stands clear above
+// them, and the standing player + hero car are both in the frame.
 export function endCamera(camera, state) {
   const cx = state.carPos.x, cz = state.carPos.z;
-  camera.position.set(cx + 9, 3.4, cz + 10);
-  camera.lookAt(-28, 4, -196);
+  camera.position.set(cx + 2, 9.0, cz + 14);
+  camera.lookAt(-29, 2, -198);
 }

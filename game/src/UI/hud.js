@@ -164,8 +164,10 @@ export function createHud(state, police, heli) {
       }
       // Popups.
       renderPopups();
-      // Crosshair only on foot in combat.
-      $('crosshair').style.display = state.onFoot && !state.inCar && state.mode !== 'title' ? 'block' : 'none';
+      // Crosshair only on foot in combat: live play, or the staged
+      // mission shot. Never on the title screen, never driving, and
+      // never in the end scene (it floated over the lighthouse frame).
+      $('crosshair').style.display = state.onFoot && !state.inCar && state.mode !== 'title' && state.shot !== 'end' ? 'block' : 'none';
       // Toast.
       const toast = $('toast');
       if (state.toastTtl > 0) {
