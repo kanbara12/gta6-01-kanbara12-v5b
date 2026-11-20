@@ -26,6 +26,39 @@ export function createPolice(scene, state) {
     });
   }
 
+  // Police roadblocks for the staged chase: striped barriers + cones
+  // parked across the beach road ahead of the hero car. They ride with
+  // the car (shot mode cruises), so they stay ahead in the frame.
+  const roadblock = new THREE.Group();
+  {
+    const orange = new THREE.MeshLambertMaterial({ color: 0xe86a1a });
+    const white = new THREE.MeshLambertMaterial({ color: 0xf5ead6 });
+    const dark = new THREE.MeshLambertMaterial({ color: 0x2a2a33 });
+    for (const [bx, bz] of [[-2.2, 0], [2.2, 0], [0, -7]]) {
+      const bar = new THREE.Group();
+      const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.55, 0.18), orange);
+      board.position.y = 0.95;
+      bar.add(board);
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.2, 0.2), white);
+      stripe.position.y = 0.95;
+      bar.add(stripe);
+      for (const s of [-1.4, 1.4]) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.0, 0.7), dark);
+        leg.position.set(s, 0.5, 0);
+        bar.add(leg);
+      }
+      bar.position.set(bx, 0, bz);
+      roadblock.add(bar);
+    }
+    for (const [cx, cz] of [[-4.5, 2.5], [-1, 3], [4.5, 2.5], [0, -4.5]]) {
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.9, 10), orange);
+      cone.position.set(cx, 0.45, cz);
+      roadblock.add(cone);
+    }
+  }
+  scene.add(roadblock);
+  roadblock.visible = false;
+
   function losClear(from, to) {
     // Line of sight: sample the straight line; a building in between
     // breaks sight (units fall back to SEARCH).
@@ -41,6 +74,13 @@ export function createPolice(scene, state) {
     units,
     update(dt, t) {
       const target = state.inCar ? state.carPos : state.playerPos;
+      // Roadblocks only in the staged chase, riding 42 m ahead of the car.
+      if (state.mode === 'shot' && state.shot === 'chase') {
+        roadblock.visible = true;
+        roadblock.position.set(target.x, 0, target.z - 42);
+      } else {
+        roadblock.visible = false;
+      }
       // The staged yard sweep is a closed fight: no police cars drive
       // into the lot mid-frame. The HUD line still reads SEARCHING.
       if (state.mode === 'shot' && state.shot === 'mission') {

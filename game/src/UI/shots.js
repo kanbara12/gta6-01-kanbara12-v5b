@@ -31,7 +31,7 @@ export function createShots(state, dialog) {
   }
 
   return {
-    stageShot(name, characters, heroCar) {
+    stageShot(name, characters, heroCar, traffic) {
       applyStage(name);
       const s = STAGES[name];
       if (name === 'start') {
@@ -62,6 +62,17 @@ export function createShots(state, dialog) {
           [-4.5, -11, 'PURSUIT'], [4, -14, 'PURSUIT'],
           [-4, 12, 'RESPONDING'],
         ];
+        // Stage 4 traffic cars on the beach road ahead of the hero car,
+        // so 3+ read clearly near the chase at capture (the seeded lanes
+        // alone left the road empty): two northbound in the west lane,
+        // two southbound oncoming in the east lane.
+        if (traffic) {
+          const z = state.carPos.z;
+          traffic.cars[0].mesh.position.set(-28.5, 0, z - 28);
+          traffic.cars[1].mesh.position.set(-23.5, 0, z - 45);
+          traffic.cars[10].mesh.position.set(-28.5, 0, z - 55);
+          traffic.cars[11].mesh.position.set(-23.5, 0, z - 70);
+        }
         state.clockLabel = 'GOLDEN';
       } else if (name === 'chase') {
         // Staged 170 m south of the ferris wheel like the start shot, so

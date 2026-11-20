@@ -49,11 +49,12 @@ export function createHelicopter(scene, state) {
       if (state.shot === 'play' || state.shot === 'chase') {
         angle = 0;
         dist = 38;
-        mesh.scale.setScalar(1.5);
-        // Upper-centre of the frame, clear of the mission panel (top-left)
-        // and the palm line: the body reads against open sky, the rotor
-        // stays inside the frame, and the cone leans down to the pool.
-        mesh.position.set(target.x + 2, 13, target.z - 38);
+        mesh.scale.setScalar(1.4);
+        // West of the car, over the beach: the body reads against open
+        // sky and ocean, NEVER stacked on the ferris wheel (which sits
+        // east of the road, right of frame). Rotor disc ~22% of frame
+        // width, fully inside the frame with sky margin above it.
+        mesh.position.set(target.x - 18, 12, target.z - 33);
         mesh.rotation.y = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z);
         mesh.userData.rotor.rotation.y += dt * 22;
         mesh.userData.tailRotor.rotation.x += dt * 30;

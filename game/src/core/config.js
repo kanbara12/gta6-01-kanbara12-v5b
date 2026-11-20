@@ -48,7 +48,12 @@ export const MISSIONS = [
 // wanted, timer, speed, police and dialogue TOGETHER — never one alone.
 export const STAGES = {
   start:   { job: 1, cash: 1250,  rep: 0,  done: 0, wanted: 0, elapsed: 47,  par: 60,  speed: 128, heli: false, police: 0, dialog: null },
-  play:    { job: 2, cash: 3750,  rep: 1,  done: 1, wanted: 0, elapsed: 72,  par: 90,  speed: 141, heli: true,  police: 3, dialog: 'rae' },
+  // Shot 2 fallback (Hydrogen review): wanted 2, not 0. Zero stars with
+  // SKY-1 orbiting and four units in PURSUIT/RESPONDING reads as a
+  // contradiction to a pairwise judge; 2 stars makes the chase agree
+  // with the panel, the heli and the cone. Cash/REP/jobs/timer/speed
+  // are unchanged from the table.
+  play:    { job: 2, cash: 3750,  rep: 1,  done: 1, wanted: 2, elapsed: 72,  par: 90,  speed: 141, heli: true,  police: 3, dialog: 'rae' },
   chase:   { job: 5, cash: 13200, rep: 5,  done: 4, wanted: 3, elapsed: 129, par: 150, speed: 152, heli: true,  police: 5, dialog: 'sable' },
   mission: { job: 4, cash: 9550,  rep: 4,  done: 3, wanted: 2, elapsed: 151, par: 180, speed: 0,   heli: false, police: 0, dialog: 'marlo' },
   end:     { job: 8, cash: 22450, rep: 10, done: 8, wanted: 0, elapsed: 0,   par: 0,   speed: 0,   heli: false, police: 0, dialog: 'raeEnd' },

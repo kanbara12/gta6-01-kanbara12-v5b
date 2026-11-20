@@ -100,7 +100,7 @@ document.getElementById('btnAgain').addEventListener('click', () => {
 
 let shotSnap = false;
 if (shotParam && ['start', 'play', 'chase', 'mission', 'end'].includes(shotParam)) {
-  shots.stageShot(shotParam, characters, heroCar);
+  shots.stageShot(shotParam, characters, heroCar, traffic);
   shotSnap = true;
 }
 
