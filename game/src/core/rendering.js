@@ -23,7 +23,7 @@ export function createRendering(container) {
     side: THREE.BackSide,
     depthWrite: false,
     fog: false,
-    uniforms: { sunDir: { value: new THREE.Vector3(-0.18, 0.14, -0.98).normalize() } },
+    uniforms: { sunDir: { value: new THREE.Vector3(-0.10, 0.14, -0.99).normalize() } },
     vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: `
       varying vec3 vDir; uniform vec3 sunDir;
@@ -44,31 +44,41 @@ export function createRendering(container) {
 
   // Low sun disc over the water, north-north-west: the driving cameras
   // look north with a ~23-deg eastward view bias (camera sits west of
-  // the car), so a sun 27 deg west of north sat past the left frame edge
-  // and only its glow bled in. At 10 deg west of north the disc sits
-  // ~33 deg left of the view centre — inside the frame, upper-left.
-  const sunDir = new THREE.Vector3(-0.18, 0.14, -0.98).normalize();
+  // the car). At 10 deg west of north the disc sat behind a palm trunk
+  // at the left edge; at 6 deg west it clears the trunk and sits
+  // ~28 deg left of the view centre — inside the frame, upper-left.
+  const sunDir = new THREE.Vector3(-0.10, 0.14, -0.99).normalize();
   const sunPos = sunDir.clone().multiplyScalar(820);
   const sunDisc = new THREE.Mesh(
-    new THREE.CircleGeometry(34, 40),
-    new THREE.MeshBasicMaterial({ color: 0xffe9a8, fog: false }),
+    new THREE.CircleGeometry(48, 40),
+    new THREE.MeshBasicMaterial({ color: 0xfff3c4, fog: false }),
   );
   sunDisc.position.copy(sunPos);
   sunDisc.lookAt(0, 0, 0);
   scene.add(sunDisc);
+  // White-hot core so the disc reads as a sun against the bright sky
+  // glow, not a faint smudge: the old 34 m pale disc vanished into the
+  // sky shader's own sun halo.
+  const sunCore = new THREE.Mesh(
+    new THREE.CircleGeometry(20, 32),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false }),
+  );
+  sunCore.position.copy(sunPos).add(sunDir.clone().multiplyScalar(-2));
+  sunCore.lookAt(0, 0, 0);
+  scene.add(sunCore);
 
   const glowCanvas = document.createElement('canvas');
   glowCanvas.width = glowCanvas.height = 256;
   const gctx = glowCanvas.getContext('2d');
   const grad = gctx.createRadialGradient(128, 128, 8, 128, 128, 128);
-  grad.addColorStop(0, 'rgba(255, 220, 140, 0.9)');
+  grad.addColorStop(0, 'rgba(255, 220, 140, 0.6)');
   grad.addColorStop(0.35, 'rgba(255, 150, 70, 0.45)');
   grad.addColorStop(1, 'rgba(255, 120, 50, 0)');
   gctx.fillStyle = grad;
   gctx.fillRect(0, 0, 256, 256);
   const glowTex = new THREE.CanvasTexture(glowCanvas);
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false, fog: false }));
-  glow.scale.set(340, 340, 1);
+  glow.scale.set(420, 420, 1);
   glow.position.copy(sunPos);
   scene.add(glow);
 

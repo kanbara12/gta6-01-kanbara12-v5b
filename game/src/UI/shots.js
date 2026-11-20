@@ -171,8 +171,8 @@ export function endCamera(camera, state) {
   // Pulled back and low, looking slightly up at the lighthouse: the
   // whole 34 m tower (red band at 24 m) fits in frame, and the player +
   // car sit at y ~420-520 — above the dialogue/speedometer cards that
-  // hid them at the old (cx+2, 9, cz+14). LookAt west of the tower so
+  // hid them at the old (cx+2, 9, cz+14). LookAt east of the tower so
   // the sun disc reads clear of the tower, low beside it.
   camera.position.set(cx + 6, 4.0, cz + 26);
-  camera.lookAt(-22, 8, -200);
+  camera.lookAt(-18, 8, -200);
 }
