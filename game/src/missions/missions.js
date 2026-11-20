@@ -5,26 +5,27 @@ import { MISSIONS, ECONOMY, repFor, cashAtJobStart } from '../core/config.js';
 
 export function createMissions(scene, state) {
   // Mission marker: a small glowing disc + ring on the ground and a
-  // modest vertical beam — never a giant pillar.
+  // modest vertical beam — never a giant pillar. The old 7 m beam read
+  // as a translucent skyscraper in every driving shot (m4).
   const marker = new THREE.Group();
   const disc = new THREE.Mesh(
-    new THREE.CircleGeometry(2.2, 28),
+    new THREE.CircleGeometry(1.7, 28),
     new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.75, depthWrite: false }),
   );
   disc.rotation.x = -Math.PI / 2;
   marker.add(disc);
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(2.2, 2.7, 28),
+    new THREE.RingGeometry(1.7, 2.1, 28),
     new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.9, side: THREE.DoubleSide }),
   );
   ring.rotation.x = -Math.PI / 2;
   ring.position.y = 0.05;
   marker.add(ring);
   const beam = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.45, 0.7, 7, 12, 1, true),
-    new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false }),
+    new THREE.CylinderGeometry(0.22, 0.32, 3.2, 12, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false }),
   );
-  beam.position.y = 3.5;
+  beam.position.y = 1.6;
   marker.add(beam);
   scene.add(marker);
   let pulse = 0;
@@ -66,7 +67,7 @@ export function createMissions(scene, state) {
       if (pt) {
         marker.position.set(pt.x, 0.06, pt.z);
         ring.scale.setScalar(1 + Math.sin(pulse * 3) * 0.12);
-        beam.material.opacity = 0.18 + Math.sin(pulse * 2) * 0.06;
+        beam.material.opacity = 0.11 + Math.sin(pulse * 2) * 0.04;
       }
       if (state.mode === 'shot' || !pt) {
         // Staged scenes never advance, but the marker distance still

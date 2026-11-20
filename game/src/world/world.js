@@ -34,7 +34,7 @@ export function createWorld(scene) {
   waterTex.repeat.set(6, 6);
   const water = new THREE.Mesh(
     new THREE.PlaneGeometry(200, 560),
-    new THREE.MeshPhongMaterial({ map: waterTex, shininess: 120, specular: 0xffb36b }),
+    new THREE.MeshPhongMaterial({ map: waterTex, shininess: 120, specular: 0xffb36b, emissive: 0x241608 }),
   );
   water.rotation.x = -Math.PI / 2;
   water.position.set(-160, 0.0, 0);
@@ -43,18 +43,19 @@ export function createWorld(scene) {
 
   // Sun glitter streak on the water, pointing at the low sun.
   const streak = new THREE.Mesh(
-    new THREE.PlaneGeometry(26, 190),
-    new THREE.MeshBasicMaterial({ color: 0xffc06a, transparent: true, opacity: 0.28, depthWrite: false }),
+    new THREE.PlaneGeometry(40, 190),
+    new THREE.MeshBasicMaterial({ color: 0xffc06a, transparent: true, opacity: 0.38, depthWrite: false }),
   );
   streak.rotation.x = -Math.PI / 2;
   streak.position.set(-120, 0.06, 10);
   group.add(streak);
   animated.sunStreak = streak;
 
-  // Foam line where the waves meet the sand.
+  // Foam line where the waves meet the sand — wide and bright enough to
+  // read as surf from the beach road, not a hairline.
   const foam = new THREE.Mesh(
-    new THREE.PlaneGeometry(3, 560),
-    new THREE.MeshBasicMaterial({ color: 0xfff2d8, transparent: true, opacity: 0.55, depthWrite: false }),
+    new THREE.PlaneGeometry(5, 560),
+    new THREE.MeshBasicMaterial({ color: 0xfff2d8, transparent: true, opacity: 0.65, depthWrite: false }),
   );
   foam.rotation.x = -Math.PI / 2;
   foam.position.set(-63, 0.08, 0);
@@ -168,8 +169,10 @@ export function createWorld(scene) {
   const buildingCount = count;
 
   // ---- Palms: trunk + 6-9 drooping fronds, never flat discs ----
+  // Fronds are lit greens with a warm emissive lift: at dusk the old
+  // dark greens read as black silhouettes from the road.
   const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6a4a2e });
-  const frondMats = [0x2e7a3a, 0x3a8a44, 0x276832].map((c) => new THREE.MeshLambertMaterial({ color: c, side: THREE.DoubleSide }));
+  const frondMats = [0x3a9a4a, 0x46aa55, 0x35883f].map((c) => new THREE.MeshLambertMaterial({ color: c, emissive: 0x14301a, side: THREE.DoubleSide }));
   const frondGeo = new THREE.PlaneGeometry(0.9, 4.6, 1, 3);
   // Droop the frond tip downward by bending its vertices.
   {

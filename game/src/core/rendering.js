@@ -23,7 +23,7 @@ export function createRendering(container) {
     side: THREE.BackSide,
     depthWrite: false,
     fog: false,
-    uniforms: { sunDir: { value: new THREE.Vector3(-0.85, 0.16, 0.25).normalize() } },
+    uniforms: { sunDir: { value: new THREE.Vector3(-0.45, 0.13, -0.88).normalize() } },
     vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: `
       varying vec3 vDir; uniform vec3 sunDir;
@@ -42,8 +42,11 @@ export function createRendering(container) {
   });
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(900, 24, 16), skyMat));
 
-  // Low sun disc over the water, west, with a soft glow halo sprite.
-  const sunDir = new THREE.Vector3(-0.85, 0.14, 0.22).normalize();
+  // Low sun disc over the water, north-west: ahead-left of every camera
+  // that looks north up the beach road, so the disc + glow read in the
+  // driving shots and the end scene (the old south-west sun sat behind
+  // those cameras and never appeared in a frame).
+  const sunDir = new THREE.Vector3(-0.45, 0.13, -0.88).normalize();
   const sunPos = sunDir.clone().multiplyScalar(820);
   const sunDisc = new THREE.Mesh(
     new THREE.CircleGeometry(34, 40),
@@ -71,7 +74,7 @@ export function createRendering(container) {
   // Warm key light from the sun direction plus warm bounce so shaded
   // (east-facing) walls read as dark amber, never void black.
   const sun = new THREE.DirectionalLight(0xffb36b, 2.1);
-  sun.position.set(-160, 55, 45);
+  sun.position.set(-120, 45, -230);
   scene.add(sun);
   const bounce = new THREE.HemisphereLight(0xff9a5c, 0x4a2c4a, 1.15);
   scene.add(bounce);
@@ -127,11 +130,14 @@ export function createRendering(container) {
 export function chaseCamera(camera, carPos, heading, dt, snap = false) {
   const fwd = { x: Math.sin(heading), z: Math.cos(heading) };
   const right = { x: -fwd.z, z: fwd.x };
-  // Low, close, offset to the WEST (sunlit) flank: the setting sun lights
-  // that side of the car, and the beach stays in the left of the frame.
-  const tx = carPos.x - fwd.x * 5.8 - right.x * 3.0;
-  const tz = carPos.z - fwd.z * 5.8 - right.z * 3.0;
-  const ty = carPos.y + 2.4;
+  // TRUE rear three-quarter: low, close, and well to the side (47 deg
+  // off the rear axis), so the car's near flank, sloped hood line,
+  // raked glass, wheels and arches all read in one frame. The old
+  // 27-deg offset was still basically a rear view — the coupe read as
+  // stacked slabs. West flank: the setting sun lights that side.
+  const tx = carPos.x - fwd.x * 4.6 - right.x * 5.0;
+  const tz = carPos.z - fwd.z * 4.6 - right.z * 5.0;
+  const ty = carPos.y + 2.1;
   if (snap) {
     camera.position.set(tx, ty, tz);
   } else {
@@ -140,5 +146,5 @@ export function chaseCamera(camera, carPos, heading, dt, snap = false) {
     camera.position.y += (ty - camera.position.y) * k;
     camera.position.z += (tz - camera.position.z) * k;
   }
-  camera.lookAt(carPos.x + fwd.x * 7, carPos.y + 1.2, carPos.z + fwd.z * 7);
+  camera.lookAt(carPos.x + fwd.x * 5, carPos.y + 1.1, carPos.z + fwd.z * 5);
 }
