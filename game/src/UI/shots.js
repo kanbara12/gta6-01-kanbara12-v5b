@@ -68,10 +68,15 @@ export function createShots(state, dialog) {
         // two southbound oncoming in the east lane.
         if (traffic) {
           const z = state.carPos.z;
-          traffic.cars[0].mesh.position.set(-28.5, 0, z - 28);
-          traffic.cars[1].mesh.position.set(-23.5, 0, z - 45);
-          traffic.cars[10].mesh.position.set(-28.5, 0, z - 55);
-          traffic.cars[11].mesh.position.set(-23.5, 0, z - 70);
+          // Traffic staged 40-75 m ahead of the hero car: at capture
+          // (car cruises ~20 m during the 6 s settle) they sit 15-45 m
+          // ahead, 3+ clearly near. The old spots (28-70 m) left the
+          // nearest car ~11 m ahead — a black slab dead-centre that hid
+          // the hero car's front.
+          traffic.cars[0].mesh.position.set(-28.5, 0, z - 40);
+          traffic.cars[1].mesh.position.set(-23.5, 0, z - 50);
+          traffic.cars[10].mesh.position.set(-28.5, 0, z - 62);
+          traffic.cars[11].mesh.position.set(-23.5, 0, z - 75);
         }
         state.clockLabel = 'GOLDEN';
       } else if (name === 'chase') {
@@ -107,7 +112,7 @@ export function createShots(state, dialog) {
         state.carSpeed = 0;
         state.speedKmh = 0;
         state.carPos.set(108, 0, 136);
-        state.playerPos.set(140, 0, 156);
+        state.playerPos.set(136, 0, 152);
         state.playerHeading = Math.PI;
         characters.resetYard();
         state.targetsDown = 2;
@@ -146,7 +151,7 @@ export function missionCamera(camera, state, characters) {
   const h = state.playerHeading;
   const fx = Math.sin(h), fz = Math.cos(h);
   const rx = fz, rz = -fx;
-  camera.position.set(px - fx * 5.0 + rx * 3.5, 3.2, pz - fz * 5.0 + rz * 3.5);
+  camera.position.set(px - fx * 7.0 + rx * 3.0, 3.0, pz - fz * 7.0 + rz * 3.0);
   let lx = px + fx * 8, lz = pz + fz * 8;
   if (characters && characters.enemies && characters.enemies.length) {
     let sx = 0, sz = 0;
@@ -163,6 +168,11 @@ export function missionCamera(camera, state, characters) {
 // them, and the standing player + hero car are both in the frame.
 export function endCamera(camera, state) {
   const cx = state.carPos.x, cz = state.carPos.z;
-  camera.position.set(cx + 2, 9.0, cz + 14);
-  camera.lookAt(-29, 2, -198);
+  // Pulled back and low, looking slightly up at the lighthouse: the
+  // whole 34 m tower (red band at 24 m) fits in frame, and the player +
+  // car sit at y ~420-520 — above the dialogue/speedometer cards that
+  // hid them at the old (cx+2, 9, cz+14). LookAt west of the tower so
+  // the sun disc reads clear of the tower, low beside it.
+  camera.position.set(cx + 6, 4.0, cz + 26);
+  camera.lookAt(-22, 8, -200);
 }

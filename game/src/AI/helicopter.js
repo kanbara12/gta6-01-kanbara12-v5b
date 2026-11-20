@@ -48,13 +48,15 @@ export function createHelicopter(scene, state) {
       // (open beach to the west), never clipped at the top.
       if (state.shot === 'play' || state.shot === 'chase') {
         angle = 0;
-        dist = 38;
+        dist = 32;
         mesh.scale.setScalar(1.4);
         // West of the car, over the beach: the body reads against open
         // sky and ocean, NEVER stacked on the ferris wheel (which sits
-        // east of the road, right of frame). Rotor disc ~22% of frame
-        // width, fully inside the frame with sky margin above it.
-        mesh.position.set(target.x - 18, 12, target.z - 33);
+        // east of the road, right of frame). The old offset (-18, -33)
+        // put the heli ~47 deg left of the chase camera's view centre —
+        // outside the frame entirely. (-10, -30) is ~30 deg left: inside
+        // the frame, upper-left, rotor disc fully inside the frame.
+        mesh.position.set(target.x - 10, 12, target.z - 30);
         mesh.rotation.y = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z);
         mesh.userData.rotor.rotation.y += dt * 22;
         mesh.userData.tailRotor.rotation.x += dt * 30;

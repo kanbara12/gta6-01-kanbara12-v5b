@@ -36,14 +36,14 @@ export function createPolice(scene, state) {
     const dark = new THREE.MeshLambertMaterial({ color: 0x2a2a33 });
     for (const [bx, bz] of [[-2.2, 0], [2.2, 0], [0, -7]]) {
       const bar = new THREE.Group();
-      const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.55, 0.18), orange);
+      const board = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.7, 0.18), orange);
       board.position.y = 0.95;
       bar.add(board);
-      const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.2, 0.2), white);
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.25, 0.2), white);
       stripe.position.y = 0.95;
       bar.add(stripe);
       for (const s of [-1.4, 1.4]) {
-        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.0, 0.7), dark);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.15, 0.7), dark);
         leg.position.set(s, 0.5, 0);
         bar.add(leg);
       }
@@ -74,10 +74,12 @@ export function createPolice(scene, state) {
     units,
     update(dt, t) {
       const target = state.inCar ? state.carPos : state.playerPos;
-      // Roadblocks only in the staged chase, riding 42 m ahead of the car.
+      // Roadblocks only in the staged chase, riding 32 m ahead of the
+      // car — close enough to read clearly (at 42 m they were small and
+      // half-hidden behind the pursuit units).
       if (state.mode === 'shot' && state.shot === 'chase') {
         roadblockGroup.visible = true;
-        roadblockGroup.position.set(target.x, 0, target.z - 42);
+        roadblockGroup.position.set(target.x, 0, target.z - 32);
       } else {
         roadblockGroup.visible = false;
       }
